@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+<link rel="stylesheet" href="/WMweb/style.css">
+</head>
+<body>
+
+	<h3>Warehouse Management</h3>
+	<h4 id = "welcome"></h4>
+	<a href = "Logout">Logout</a>
+	<h5>Select action </h5>
+		 <select id = "choice">
+		  <option value="addSup">   1) Add supplier</option>
+		  <option value="addCust">  2) Add customer</option>
+		  <option value="addProd">  3) Add product</option>
+		  <option value="viewData"> 4) View Database</option>
+		</select>
+		<button id = "btn" onclick = "action()">Submit</button> 
+	<script>
+
+		window.onload = function()
+		{
+			var box = document.getElementById("welcome");
+			fetch("http://localhost:8080/WMweb/Session").then(res => res.json()).then(data => {
+				if(data===null)
+				{
+					window.location="ErrorPage.html";
+					return;
+				}		
+				box.innerHTML = "Welcome "+data.userName;
+			}).catch(error => console.log(error));
+		}
+		function action()
+		{
+			var choice = document.getElementById("choice");
+			if(choice.value === "addSup")
+			{
+				localStorage.setItem("ch1", "Supplier");
+				window.location="admin/createUser.html";
+			}
+			else if(choice.value === "addCust")
+			{
+				localStorage.setItem("ch1", "Customer");
+				window.location="admin/createUser.html";
+			}
+			else if(choice.value === "addProd")
+			{
+				window.location="admin/createProd.html";
+			}
+			else if(choice.value === "viewData")
+			{
+				window.location="admin/viewData.html";
+			}
+		}
+	</script>
+</body>
+</html>

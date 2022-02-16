@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+	<h3>Warehouse Management</h3>
+	<h5 id = "heading"> </h5>
+		Enter name:
+		<input type = "hidden" name = "type" value ="" id="type" >
+		<input type = "text" id = "name">
+		<button onclick="addUser()">Add User</button> 
+	<script>		
+		window.onload = async function()
+		{
+			await fetch("http://localhost:8080/WMweb/Session").then(res => res.json()).then(data => {
+				if(data===null)
+				{
+					window.location="/WMweb/ErrorPage.html";
+					return;
+				}
+			});
+			var type;
+			var user = localStorage.getItem("ch1");
+			var heading = document.getElementById("heading");
+			heading.innerHTML="Add "+user;
+			var hiddenField = document.getElementById("type");
+			if(user === "Customer")
+			{
+				hiddenField.setAttribute("value",3);
+			}
+			if(user === "Supplier")
+			{
+				hiddenField.setAttribute("value",2);
+			}
+		}
+
+		function addUser()
+		{
+			let formdata = new FormData();
+
+			var name = document.getElementById("name");
+			var category = document.getElementById("type");
+
+			formdata.append("name", name.value);
+			formdata.append('type', type.value);
+
+			var reqBody = new URLSearchParams(formdata);
+
+			fetch("http://localhost:8080/WMweb/Users/",
+			{
+				method: "POST",
+				body: reqBody
+			}).then(res => res.json()).then(data => {				
+				window.alert("User registered successfully..New User ID is "+data);
+				window.location.href="/WMweb/adminMenu.html";
+			}).catch(error => console.log(error));
+		}
+	</script>
+</body>
+</html>

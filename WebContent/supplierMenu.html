@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+<link rel="stylesheet" href="/WMweb/style.css">
+</head>
+<body>
+	<h3>Warehouse Management</h3>
+	<h4 id = "welcome"></h4>
+	<a href = "Logout">Logout</a>
+	<h5>Select action</h5>
+	<select name = "choice" id ="choice">
+		<option value="stock"> 1) Stock products</option>
+		<option value="remove">2) Remove products</option>
+	</select>
+	<button id = "btn" onclick = "action()">Submit</button> 
+	<script>
+
+		window.onload = function()
+		{
+			var box = document.getElementById("welcome");
+			fetch("http://localhost:8080/WMweb/Session").then(res => res.json()).then(data => {
+				if(data===null)
+				{
+					window.location="ErrorPage.html";
+					return;
+				}
+				box.innerHTML = "Welcome "+data.userName;
+			});
+		}
+
+		function action()
+		{
+			var choice = document.getElementById("choice");
+			if(choice.value === "stock")
+			{
+				window.location="supplier/stock.html";
+			}
+			else if(choice.value === "remove")
+			{
+				window.location="supplier/remove.html";
+			}
+		}
+	
+	</script>
+</body>
+</html>

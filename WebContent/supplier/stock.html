@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+<link rel="stylesheet" href="/WMweb/style.css">
+</head>
+<body>
+	<h5>Select product to stock</h5>
+	Select product:
+		 <select name = "product" id="products">
+		</select>
+	Enter quantity:
+		<input type= "text" id="qty">
+		<button onclick = "stockProduct()">Stock Product</button>
+	<script>
+		window.onload = async function()
+		{
+			await fetch("http://localhost:8080/WMweb/Session").then(res => res.json()).then(data => {
+				if(data===null)
+				{
+					window.location="/WMweb/ErrorPage.html";
+					return;
+				}
+			});
+			fetch("http://localhost:8080/WMweb/Products/").then(res => res.json()).then(data => 
+			{
+				var products = document.getElementById("products");
+				data.forEach(element => {
+
+					var temp = document.createElement("option");
+					console.log(element.prodId);
+					temp.setAttribute("value", element.prodId);
+					temp.innerHTML=element.prodName
+					products.appendChild(temp);
+				});
+			});
+		}
+
+		function stockProduct()
+		{
+			let formdata = new FormData();
+
+			var qty = document.getElementById("qty");
+			var prod = document.getElementById("products");
+
+			formdata.append("qty", qty.value);
+			formdata.append('product', prod.value);
+			formdata.append("actionPerformed","Stocked");
+
+			var reqBody = new URLSearchParams(formdata);
+
+			fetch("http://localhost:8080/WMweb/Warehouse/",
+			{
+				method: "POST",
+				body: reqBody
+			}).then(res => res.json()).then(data => {				
+				window.alert(qty.value+" unit(s) of Product number "+data+" was successfully added to warehouse");
+				window.location.href="/WMweb/supplierMenu.html";
+			}).catch(error => console.log(error));
+		}
+	</script>
+</body>
+</html>

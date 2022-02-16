@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+<link rel="stylesheet" href="/WMweb/style.css">
+</head>
+<body>
+	<h3>Warehouse Management</h3>
+	<h5>Select user</h5>
+		 <select id = "choice">
+		  <option value="Admin">1) Admin</option>
+		  <option value="Supplier">2) Supplier</option>
+		  <option value="Customer">3) Customer</option>
+		</select>
+		<button onclick = "store()">Submit</button>	
+		<script>	
+			function store()
+			{
+				var choice = document.getElementById("choice");
+				localStorage.setItem("ch",choice.value);
+				window.location.href = "login.html";
+			}		
+		</script> 
+</body>
+
+</html>

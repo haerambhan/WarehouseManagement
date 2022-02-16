@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+<link rel="stylesheet" href="/WMweb/style.css">
+</head>
+<body>
+	<h3>Warehouses Management</h3>
+		<h5> Add Product</h5>  
+		Enter product name: <input type = "text" name = "name" id="name"><br>
+		Enter product category: <select name="category" id = "category"></select><br>
+		Enter product price: <input type = "text" name = "price" id="price"><br>	
+		Add Images : <button onclick = "addImageInputBox()">Add</button> <div id="images"></div>
+		<button onclick = "addProduct()">Create Product</button>
+	<script>
+		window.onload = async function()
+		{
+			await fetch("http://localhost:8080/WMweb/Session").then(res => res.json()).then(data => {
+				if(data===null)
+				{
+					window.location="/WMweb/ErrorPage.html";
+					return;
+				}
+			}).catch(error => console.log(error));
+			fetch("http://localhost:8080/WMweb/Categories/").then(res => res.json()).then(data => 
+			{
+				var categories = document.getElementById("category");
+				data.forEach(element => {
+
+					var temp = document.createElement("option");
+					temp.setAttribute("value", element.catId);
+					temp.innerHTML=element.catName
+					categories.appendChild(temp);
+				});
+			}).catch(error => console.log(error));
+		}
+		function addImageInputBox()
+		{
+			var inputBox = document.createElement("input");
+			inputBox.setAttribute("type", "text");
+			inputBox.setAttribute("id", "image");
+			var images = document.getElementById("images");
+			images.appendChild(inputBox);
+			images.appendChild(document.createElement("br"));
+		}
+
+		function addProduct()
+		{
+			let formdata = new FormData();
+
+			var name = document.getElementById("name");
+			var category = document.getElementById("category");
+			var price = document.getElementById("price");
+
+			formdata.append("name", name.value);
+			formdata.append('category',category.value);
+			formdata.append('price',price.value);
+
+			var x = new URLSearchParams(formdata);
+
+			fetch("http://localhost:8080/WMweb/Products/",
+			{
+				method: "POST",
+				body: x
+			}).then(res => res.json()).then(data => {
+				
+				var images = document.querySelectorAll("#image");
+				images.forEach((image) => {
+					let formdata = new FormData();
+					formdata.append("imageUrl", image.value);
+					formdata.append("prodId", data);
+					var y = new URLSearchParams(formdata);
+
+					fetch("http://localhost:8080/WMweb/Images/",
+					{
+						method: "POST",
+						body: y
+						
+					}).then(res => res.json()).then(dta => 
+					{
+						window.alert("Product registered successfully..New Product ID is "+data);
+						window.location.href="/WMweb/adminMenu.html";
+					})
+				})
+			}).catch(error => console.log(error));
+		}
+	</script>
+</body>
+</html>

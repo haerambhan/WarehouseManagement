@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+<link rel="stylesheet" href="/WMweb/style.css">
+</head>
+<body>
+	<h5>Database</h5>
+	<form action = "" method = "get">
+	Select data:
+		<select name = "ch" onchange="hello()">
+			<option value="Users">Show users</option>
+			<option value="Products">Show products</option>
+			<option value="Categories">Show categories</option>
+			<option value="History">Show Transaction history</option>
+			<option value="Warehouse">Show warehouse content</option>
+		</select>
+		<input type = "submit"> 
+	</form>
+	<script>
+
+		window.onload = async function()
+		{
+			var box = document.getElementById("welcome");
+			await fetch("http://localhost:8080/WMweb/Session").then(res => res.json()).then(data => {
+				if(data===null)
+				{
+					window.location="/WMweb/ErrorPage.html";
+					return;
+				}		
+			});
+		}
+		var form = document.querySelector("form");
+		function hello()
+		{
+			var select = document.querySelector("select");
+			console.log(select.value)
+			form.setAttribute("action","../"+select.value);
+		}
+	</script>
+</body>
+</html>

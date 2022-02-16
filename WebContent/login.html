@@ -1,0 +1,32 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+<link rel="stylesheet" href="/WMweb/style.css">
+</head>
+<body>
+
+<h3>Warehouse Management</h3>
+	<h5><span id = "user"></span> Login</h5>
+	  
+	<form action = "Validate" method = "post">
+	Enter your ID:
+		<input type = "hidden" name = "ch" value = "" id ="myInput" >
+		<input type = "text" name = "id">
+		<input type = "submit"> 
+	</form>
+	<script>
+		window.onload = function()
+		{
+			var value = document.getElementById("user");
+			var x = document.getElementById("myInput"); 
+			var ch = localStorage.getItem("ch");		
+			x.setAttribute("value",ch);
+			value.innerHTML= ch;
+		}
+	</script>
+
+</body>
+</html>

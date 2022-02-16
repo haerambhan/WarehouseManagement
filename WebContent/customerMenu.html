@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+<link rel="stylesheet" href="/WMweb/style.css">
+</head>
+<body>
+    <h3>Warehouse Management</h3>
+    <h4 id = "welcome"></h4>
+	<a href = "Logout">Logout</a>
+    <h5>Select category</h5>
+	<div id="options"> 		 
+    </div>
+    <button onclick = "action()">Submit</button>	
+    <script>
+		window.onload = async function()
+		{
+			var box = document.getElementById("welcome");
+			await fetch("http://localhost:8080/WMweb/Session").then(res => res.json()).then(data => {
+                if(data===null)
+				{
+                    window.location="ErrorPage.html";
+                    return;
+				}
+				box.innerHTML = "Welcome "+data.userName;
+            });
+            fetch("http://localhost:8080/WMweb/Categories").then(res => res.json()).then(data => {
+                var options = document.getElementById("options");
+                data.forEach(element => {
+                    var temp = document.createElement("input");
+                    var text = document.createElement("span");
+                    temp.setAttribute("type", "radio");
+                    temp.setAttribute("name", "cat");
+                    temp.setAttribute("value", element.catId);
+                    temp.setAttribute("class","rad");
+                    temp.setAttribute("checked", true);
+                    options.appendChild(temp);
+                    text.innerHTML = "Category ID: "+element.catId+" Category: "+element.catName;
+                    options.appendChild(text);
+                    options.appendChild(document.createElement("br"))
+                    text.setAttribute("class","rad");
+                    });
+            });  
+		}
+		function action()
+		{
+            console.log("First");
+            var ele = document.getElementsByName('cat');     
+            for(i = 0; i < ele.length; i++) { 
+                if(ele[i].checked) 
+                {
+                    localStorage.setItem("category",ele[i].value);
+                }
+            } 
+			window.location="customer/selectProduct.html";
+		}
+	
+	</script>
+</body>
+</html>

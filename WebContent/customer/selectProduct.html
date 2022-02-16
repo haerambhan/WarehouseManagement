@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+<link rel="stylesheet" href="/WMweb/style.css">
+</head>
+<body>
+	<h3>Warehouse Management</h3>
+	<h5>Select product</h5>
+	<div id="options"> 		 
+    </div>
+    <button onclick = "action()">View Product Details</button>	
+    <script>
+		window.onload = async function()
+		{
+
+            await fetch("http://localhost:8080/WMweb/Session").then(res => res.json()).then(data => {
+				if(data===null)
+				{
+					window.location="/WMweb/ErrorPage.html";
+					return;
+				}
+			}).catch(error => console.log(error));
+			var catId = localStorage.getItem("category");
+            fetch("http://localhost:8080/WMweb/Products/?catId="+catId).then(res => res.json()).then(data => {
+                var options = document.getElementById("options");
+                data.forEach(element => {
+                    var temp = document.createElement("input");
+                    var text = document.createElement("span");
+                    temp.setAttribute("type", "radio");
+                    temp.setAttribute("name", "prod");
+                    temp.setAttribute("class","rad");
+                    temp.setAttribute("value", element.prodId);
+                    temp.setAttribute("checked", true);
+                    options.appendChild(temp);
+                    text.innerHTML = "Product ID: "+element.prodId+" Product: "+element.prodName;
+                    options.appendChild(text);
+                    options.appendChild(document.createElement("br"));
+                    text.setAttribute("class","rad");
+                    });
+            }).catch(error => console.log(error));  
+		}
+
+		function action()
+		{
+            console.log("Hi");
+            var ele = document.getElementsByName('prod');    
+            console.log(ele); 
+            for(i = 0; i < ele.length; i++) { 
+                console.log("ProductID: ",ele[i].value);
+                if(ele[i].checked) 
+                {
+                    localStorage.setItem("product",ele[i].value);
+                    break;
+                }
+            } 
+			window.location="productDetails.html";
+		}
+	
+	</script>
+</body>
+</html>

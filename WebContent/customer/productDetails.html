@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+<link rel="stylesheet" href="/WMweb/style.css">
+<style>
+    .image{
+        height: 200px;
+    }
+
+</style>
+</head>
+<body>
+    <h4>Product ID: </h4><span id="productId"></span>
+    <h4>Product Name: </h4><span id="prodName"></span>
+    <h4>Product Images: </h4><span id="prodImages"></span>
+    <h4>Select Supplier</h4><select name="sup" id = "suppliers"></select><br>
+    <h4>Product Ratings: </h4><span id="prodRating"></span>
+    <h4>Your Rating: </h4>
+        <div id="currentUserRating">
+            <input id="giveRating">
+            <button onclick = "rate()">Rate</button>
+        </div><br>
+    <button onclick = "buy()">Buy</button>
+    
+
+    <script>
+
+        var userId; 
+        var prodId = localStorage.getItem("product");  
+        window.onload = async function()
+        {
+            var productId = document.getElementById("productId");
+            var prodName = document.getElementById("prodName");
+            var prodImages = document.getElementById("prodImages");
+            var suppliers = document.getElementById("suppliers");
+            var prodRating = document.getElementById("prodRating");
+            var currentUserRating = document.getElementById("currentUserRating");
+
+            await fetch("http://localhost:8080/WMweb/Session").then(res => res.json()).then(data => {
+                if(data===null)
+				{
+					window.location="/WMweb/ErrorPage.html";
+					return;
+				}
+                console.log("Session",data)
+				userId = data.userId;
+			}).catch(error => console.log(error));
+            await fetch("http://localhost:8080/WMweb/Ratings/"+prodId+"/?userId="+userId).then(res => res.json()).then(data => {
+                
+                if(data!==null)
+                {
+                    console.log("User rating",data);
+                    var currentUserRating = document.getElementById("currentUserRating");
+                    currentUserRating.innerHTML=data.rating+" out of 10";
+                }
+            }).catch(error => console.log(error));
+            await fetch("http://localhost:8080/WMweb/Products/"+prodId).then(res => res.json()).then(data => {
+
+                productId.innerHTML = data.prodId;
+                prodName.innerHTML = data.prodName;
+
+            }).catch(error => console.log(error));
+
+            await fetch("http://localhost:8080/WMweb/Users/?prodId="+prodId).then(res =>
+                {
+                    if(res.status!==200)
+                    {
+                        var body = document.querySelector("body");
+					    body.innerHTML="";
+                        window.alert("Product is not in stock");
+                        window.location.href="/WMweb/customerMenu.html";
+                        return;
+                    }
+                    return res.json();
+                }).then(data => {
+
+                data.forEach(element => {
+                    var temp = document.createElement("option");
+                    temp.setAttribute("value", element.userId);
+                    temp.innerHTML = element.userName;
+                    suppliers.appendChild(temp);  
+                });
+            }).catch(error => console.log(error));
+
+            await fetch("http://localhost:8080/WMweb/Images/?prodId="+prodId).then(res => {
+
+                if(res.status!==200)
+                {
+                    prodImages.innerHTML="No images available";
+                }
+                else
+                return res.json();
+
+            }).then(data => {
+
+                console.log("Images",data);
+                data.forEach(element => {
+                    var temp = document.createElement("img");
+                    temp.setAttribute("src",element.imageUrl);
+                    temp.setAttribute("alt","IMAGE");
+                    temp.setAttribute("class","image");
+                    prodImages.appendChild(temp);
+                })
+            }).catch(error => console.log(error));
+
+            await fetch("http://localhost:8080/WMweb/Ratings/"+prodId).then(res => {
+
+                if(res.status!==200)
+                {
+                    prodRating.innerHTML="No ratings available";
+                }
+                else
+                return res.json();
+            }).then(data => {
+                
+                console.log("Product ratings",data);
+                data.forEach(element => {
+                    var temp = document.createElement("div");
+                    temp.innerHTML = element.userName+" -- "+element.rating+"/10";
+                    prodRating.appendChild(temp);
+                })
+            }).catch(error => console.log(error));
+        }
+        
+        async function rate()
+        {   
+            let formdata = new FormData();
+			var rating = document.getElementById("giveRating");
+            if(rating.value>10)
+            {
+                window.alert("Rating must be between 1 and 10");
+                return;
+            }
+            console.log(userId,prodId);
+			formdata.append("userId", userId);
+			formdata.append('prodId', prodId);
+			formdata.append('rating',rating.value);
+
+			var reqBody = new URLSearchParams(formdata);
+            await fetch("http://localhost:8080/WMweb/Ratings",
+            {
+                method: "POST",
+                body: reqBody
+            }).then(res => {    
+                currentUserRating.innerHTML=rating.value+" out of 10";
+                console.log(res);
+            }).catch(error => console.log(error));
+        }
+
+        function buy()
+        {
+            let formdata = new FormData();
+			
+            console.log(userId,prodId);
+			formdata.append("supId", suppliers.value);
+			formdata.append('qty', 1);
+			formdata.append('actionPerformed',"Bought");
+            formdata.append("product",prodId);
+
+			var reqBody = new URLSearchParams(formdata);
+            fetch("http://localhost:8080/WMweb/Warehouse",
+            {
+                method: "POST",
+                body: reqBody
+            }).then(res => {    
+                var body = document.querySelector("body");
+				body.innerHTML="";
+                window.alert("Transaction completed successfully");
+                window.location.href="/WMweb/customerMenu.html";
+                console.log(res);
+            }).catch(error => {
+                window.alert("Unable to buy");
+            });
+        }
+    </script>
+</body>
+</html>
